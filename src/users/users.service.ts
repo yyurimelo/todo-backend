@@ -1,6 +1,13 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from 'generated/prisma';
 
 @Injectable()
 export class UsersService {
@@ -13,24 +20,54 @@ export class UsersService {
       },
     });
 
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+
     if (user !== null) {
       throw new ConflictException('E-mail já cadastrado!');
     }
 
-    return await this.prisma.user.create({ data: createUserDto });
+    return await this.prisma.user.create({
+      data: {
+        ...createUserDto,
+        password: hashedPassword,
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findOneUser(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: { id: true, name: true, email: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    return user;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+  async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: { id: true, name: true, email: true },
+    });
 
-  // update(id: number, updateUserDto: UpdateUserDto) {
-  //   return `This action updates a #${id} user`;
-  // }
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    return await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: { name: updateUserDto.name },
+    });
+  }
 
   remove(id: number) {
     return `This action removes a #${id} user`;
