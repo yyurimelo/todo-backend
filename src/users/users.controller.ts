@@ -8,10 +8,12 @@ import {
   HttpStatus,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('user')
 export class UsersController {
@@ -23,13 +25,16 @@ export class UsersController {
     return await this.usersService.createUser(createUserDto);
   }
 
+  @UseGuards(AuthGuard)
   @Get('get/:id')
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: number) {
     return this.usersService.findOneUser(+id);
   }
 
+  @UseGuards(AuthGuard)
   @Put('update')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async update(@Query('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return await this.usersService.updateUser(+id, updateUserDto);
   }
