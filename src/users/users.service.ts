@@ -2,12 +2,13 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from 'generated/prisma';
+} from '@nestjs/common'
+import { CreateUserDto } from './dto/create-user.dto'
+
+import * as bcrypt from 'bcrypt'
+import { UpdateUserDto } from './dto/update-user.dto'
+import { PrismaService } from 'src/prisma/prisma.service'
+import { User } from '@prisma/client'
 
 @Injectable()
 export class UsersService {
@@ -18,12 +19,12 @@ export class UsersService {
       where: {
         email: createUserDto.email,
       },
-    });
+    })
 
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 6)
 
     if (user !== null) {
-      throw new ConflictException('E-mail já cadastrado!');
+      throw new ConflictException('E-mail já cadastrado!')
     }
 
     return await this.prisma.user.create({
@@ -31,7 +32,7 @@ export class UsersService {
         ...createUserDto,
         password: hashedPassword,
       },
-    });
+    })
   }
 
   async findOneUser(id: number) {
@@ -40,13 +41,13 @@ export class UsersService {
         id,
       },
       select: { id: true, name: true, email: true },
-    });
+    })
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('Usuário não encontrado')
     }
 
-    return user;
+    return user
   }
 
   async findUserByEmail(email: string) {
@@ -54,13 +55,13 @@ export class UsersService {
       where: {
         email,
       },
-    });
+    })
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('Usuário não encontrado')
     }
 
-    return user;
+    return user
   }
 
   async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
@@ -69,10 +70,10 @@ export class UsersService {
         id,
       },
       select: { id: true, name: true, email: true },
-    });
+    })
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('Usuário não encontrado')
     }
 
     return await this.prisma.user.update({
@@ -80,10 +81,10 @@ export class UsersService {
         id,
       },
       data: { name: updateUserDto.name },
-    });
+    })
   }
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    return `This action removes a #${id} user`
   }
 }
