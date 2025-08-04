@@ -28,8 +28,8 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @Get('get/:id')
   @HttpCode(HttpStatus.OK)
-  findOne(@Param('id') id: number) {
-    return this.usersService.findOneUser(+id)
+  async findOne(@Param('id') id: number) {
+    return await this.usersService.findOneUser(+id)
   }
 
   @UseGuards(AuthGuard)

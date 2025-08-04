@@ -27,7 +27,7 @@ export class UsersService {
       throw new ConflictException('E-mail já cadastrado!')
     }
 
-    return await this.prisma.user.create({
+    await this.prisma.user.create({
       data: {
         ...createUserDto,
         password: hashedPassword,
