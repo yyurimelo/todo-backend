@@ -46,6 +46,9 @@ export class TasksService {
       where: { ownerId: userId, deletedAt: null },
       take: pageSize,
       skip: (pageNumber - 1) * pageSize,
+      orderBy: {
+        createdAt: 'desc',
+      },
       select: {
         id: true,
         name: true,

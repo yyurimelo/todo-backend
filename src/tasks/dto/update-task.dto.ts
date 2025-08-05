@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsString } from 'class-validator'
+import { IsISO8601, IsOptional, IsString } from 'class-validator'
 
 export class UpdateTaskDto {
   @ApiProperty({
@@ -14,9 +14,8 @@ export class UpdateTaskDto {
   @IsString()
   description: string
 
-  @ApiProperty({
-    example: '2025-08-04T00:00:00.000Z',
-  })
-  @IsString()
-  isCompleted: string
+  @ApiProperty({ example: '2025-08-04T00:00:00.000Z' })
+  @IsOptional()
+  @IsISO8601()
+  isCompleted?: Date
 }
