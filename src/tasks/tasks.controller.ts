@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  Put,
 } from '@nestjs/common'
 import { TasksService } from './tasks.service'
 import { CreateTaskDto } from './dto/create-task.dto'
@@ -16,6 +17,7 @@ import { CreateTaskDto } from './dto/create-task.dto'
 import { TokenPayload } from 'src/auth/jwt.strategy'
 import { CurrentUser } from 'src/auth/current-user-decorator'
 import { AuthGuard } from 'src/auth/auth.guard'
+import { UpdateTaskDto } from './dto/update-task.dto'
 
 @UseGuards(AuthGuard)
 @Controller('task')
@@ -29,7 +31,7 @@ export class TasksController {
     @CurrentUser() user: TokenPayload,
   ) {
     const userId = Number(user.sub)
-    return await this.tasksService.createTask(createTaskDto, userId)
+    return await this.tasksService.createTaskAsync(createTaskDto, userId)
   }
 
   @Post('get/all/paginated')
@@ -40,7 +42,10 @@ export class TasksController {
   ) {
     const userId = Number(user.sub)
 
-    return await this.tasksService.findAllTaskPaginated(
+    pageNumber = Number(pageNumber) || 1
+    pageSize = Number(pageSize) || 10
+
+    return await this.tasksService.findAllTaskPaginatedAsync(
       pageNumber,
       pageSize,
       userId,
@@ -48,25 +53,35 @@ export class TasksController {
   }
 
   @Get('get/all')
+  @HttpCode(HttpStatus.OK)
   async findAllTasks(@CurrentUser() user: TokenPayload) {
     const userId = Number(user.sub)
 
-    return await this.tasksService.findAllTasks(userId)
+    return await this.tasksService.findAllTasksAsync(userId)
   }
 
   @Get('get/:id')
-  findOne(@Param('id') id: number, @CurrentUser() user: TokenPayload) {
+  async findOne(@Param('id') id: number, @CurrentUser() user: TokenPayload) {
     const userId = Number(user.sub)
-    return this.tasksService.findOneTask(+id, userId)
+    return await this.tasksService.findOneTaskAsync(+id, userId)
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-  //   return this.tasksService.update(+id, updateTaskDto)
-  // }
+  @UseGuards(AuthGuard)
+  @Put('update')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async update(
+    @Query('id') id: number,
+    @Body() updateTaskDto: UpdateTaskDto,
+    @CurrentUser() user: TokenPayload,
+  ) {
+    const userId = Number(user.sub)
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tasksService.remove(+id)
+    return await this.tasksService.updateTaskAsync(+id, userId, updateTaskDto)
+  }
+
+  @Delete('remove')
+  async removeTask(@Query('id') id: string, @CurrentUser() user: TokenPayload) {
+    const userId = Number(user.sub)
+    return await this.tasksService.removeTaskAsync(+id, userId)
   }
 }

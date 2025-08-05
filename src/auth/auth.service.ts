@@ -12,8 +12,8 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(signInDto: SignInDto): Promise<AuthResponseDto> {
-    const user = await this.usersService.findUserByEmail(signInDto.email)
+  async signInAsync(signInDto: SignInDto): Promise<AuthResponseDto> {
+    const user = await this.usersService.findUserByEmailAsync(signInDto.email)
 
     const isPasswordValid = await bcrypt.compare(
       signInDto.password,

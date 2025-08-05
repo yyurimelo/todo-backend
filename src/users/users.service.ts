@@ -7,14 +7,14 @@ import { CreateUserDto } from './dto/create-user.dto'
 
 import * as bcrypt from 'bcrypt'
 import { UpdateUserDto } from './dto/update-user.dto'
-import { PrismaService } from 'src/prisma/prisma.service'
+import { PrismaService } from 'src/database/prisma/prisma.service'
 import { User } from '@prisma/client'
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async createUser(createUserDto: CreateUserDto) {
+  async createUserAsync(createUserDto: CreateUserDto) {
     const user = await this.prisma.user.findUnique({
       where: {
         email: createUserDto.email,
@@ -35,7 +35,7 @@ export class UsersService {
     })
   }
 
-  async findOneUser(id: number) {
+  async findOneUserAsync(id: number) {
     const user = await this.prisma.user.findUnique({
       where: {
         id,
@@ -50,7 +50,7 @@ export class UsersService {
     return user
   }
 
-  async findUserByEmail(email: string) {
+  async findUserByEmailAsync(email: string) {
     const user = await this.prisma.user.findUnique({
       where: {
         email,
@@ -64,12 +64,14 @@ export class UsersService {
     return user
   }
 
-  async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+  async updateUserAsync(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: {
         id,
       },
-      select: { id: true, name: true, email: true },
     })
 
     if (!user) {
@@ -82,9 +84,5 @@ export class UsersService {
       },
       data: { name: updateUserDto.name },
     })
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`
   }
 }

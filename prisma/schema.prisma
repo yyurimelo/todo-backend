@@ -32,6 +32,7 @@ model Task {
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
   endDateTime DateTime?
+  deletedAt   DateTime? @map("deleted_at")
 
   owner   User @relation(fields: [ownerId], references: [id])
   ownerId Int  @map("owner_id")

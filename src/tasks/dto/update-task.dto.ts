@@ -15,7 +15,7 @@ export class UpdateTaskDto {
   description: string
 
   @ApiProperty({
-    example: '04/08/2025',
+    example: '2025-08-04T00:00:00.000Z',
   })
   @IsString()
   isCompleted: string
